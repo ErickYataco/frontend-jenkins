@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+  post_build:
+    commands:
+      - aws s3 sync build/ s3://$S3_BUCKET
+      - echo S3 bucket is sync.
+      - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" 
+      - echo invalidation created
+
+artifacts:
+  files:
+    - '/'
+  discard-paths: yes
+  base-directory: 'dist*'
